@@ -62,7 +62,8 @@ public class AuthenticationService {
     
 
     public ResponseEntity<String>  signup(SignupRequestDTO createUserDto) {
-        Role role = roles.get(RoleType.ROLE_ETUDIANT);
+        Role role = roles.get(RoleType.ROLE_COUTISATEUR);
+        
         if(userRepository.count() == 0){
             role = roles.get(RoleType.ROLE_ADMIN);
         }
@@ -85,20 +86,20 @@ public class AuthenticationService {
         mailMessage.setSubject("Complete Registration!");
         mailMessage.setFrom("chand312902@gmail.com");
         mailMessage.setText("To confirm your account, please click here : "
-        +"http://localhost:8080/api/v1/auth/confirm-account?token="+confirmationToken.getConfirmationToken());
+        +"http://localhost:8081/api/v1/auth/confirm-account?token="+confirmationToken.getConfirmationToken());
         emailSenderService.sendEmail(mailMessage);
         return ResponseEntity.status(HttpStatus.CREATED).body("client creer avec success");
     }
 
     public JwtResponseDTO signin(LoginRequestDTO loginRequestDTO) {
-    	Optional<User> user = userRepository.findByUsername(loginRequestDTO.getUsername());
-    	System.out.println(" cc "+user.get().getUsername());
+    	Optional<User> user = userRepository.findByEmail(loginRequestDTO.getEmail());
+    	
     	if (!user.get().isIs_enabled()) {
 			
     		System.out.print("not verified");
 		}
     	else {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(),loginRequestDTO.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(),loginRequestDTO.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
         return new JwtResponseDTO(jwt);

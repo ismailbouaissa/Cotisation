@@ -1,8 +1,12 @@
+
 package com.example.demo.controllers;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +24,7 @@ import com.example.demo.services.AuthenticationService;
 
 @RequestMapping("/api/v1/auth")
 @RestController
+@CrossOrigin
 public class AuthenticationControllers {
 
 	@Autowired
@@ -45,10 +50,10 @@ public class AuthenticationControllers {
         System.out.println(token);
     	if(token != null)
         {
-        	User user = userRepository.findByEmail(token.getUser().getEmail());
-        	System.out.println(user.isEnabled());
-        	user.setIs_enabled(true);
-            userRepository.save(user);
+        	Optional<User> user = userRepository.findByEmail(token.getUser().getEmail());
+        	
+        	user.get().setIs_enabled(true);
+            userRepository.save(user.get());
         }
     	}
 
